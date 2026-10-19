@@ -1,0 +1,157 @@
+name: StackSpire builds
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'handoff/**'
+      - 'docs/**'
+      - '.agents/**'
+      - '.claude/**'
+      - '.gemini/**'
+      - '.codex/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stackspire-builds-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  packages:
+    name: ${{ matrix.platform }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            runner: ubuntu-24.04
+            arch: arm64
+          - platform: android
+            runner: ubuntu-24.04
+            arch: arm
+          - platform: android
+            runner: ubuntu-24.04
+            arch: amd64
+          - platform: windows
+            runner: windows-2022
+            arch: amd64
+          - platform: linux
+            runner: ubuntu-24.04
+            arch: amd64
+    defaults:
+      run:
+        shell: bash
+    env:
+      CARGO_BUILD_JOBS: 2
+      GOMAXPROCS: 2
+      GOFLAGS: -p=2
+    steps:
+      - name: Free space on disposable Linux runner
+        if: runner.os == 'Linux'
+        env:
+          BUILD_PLATFORM: ${{ matrix.platform }}
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL
+          if test "$BUILD_PLATFORM" = android; then
+            sudo rm -rf "$ANDROID_HOME/ndk" "$ANDROID_HOME/emulator" "$ANDROID_HOME/system-images"
+          else
+            sudo rm -rf /usr/local/lib/android
+          fi
+          df -h .
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.27.1
+          cache-dependency-path: core/go.sum
+      - name: Assign increasing CI build number
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const number = 2026104000 + Number(process.env.GITHUB_RUN_NUMBER);
+            const source = fs.readFileSync('pubspec.yaml', 'utf8');
+            if (!/^version: \S+\+\d+$/m.test(source)) throw new Error('Missing app version');
+            fs.writeFileSync('pubspec.yaml', source.replace(/^(version: \S+\+)\d+$/m, (_, prefix) => prefix + number));
+            fs.writeFileSync('CI-BUILD-INFO.txt', `commit=${context.sha}\nbuild=${number}\nrun=${context.runId}\n`);
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.6
+          channel: stable
+          cache: true
+      - uses: actions/setup-java@v4
+        if: matrix.platform == 'android'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: nttld/setup-ndk@v1
+        if: matrix.platform == 'android'
+        id: ndk
+        with:
+          ndk-version: r28c
+          link-to-sdk: true
+      - name: Set up native toolchains
+        run: |
+          rustup update stable --no-self-update
+          rustup default stable
+          git config --global core.longpaths true
+      - name: Restore Android signing from encrypted secrets
+        if: matrix.platform == 'android'
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE" && test -n "$KEY_ALIAS" && test -n "$STORE_PASSWORD" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE" | base64 --decode > android/app/keystore.jks
+          printf 'keyAlias=%s\nstorePassword=%s\nkeyPassword=%s\n' "$KEY_ALIAS" "$STORE_PASSWORD" "$KEY_PASSWORD" >> android/local.properties
+      - name: Resolve and validate
+        run: |
+          flutter pub get
+          flutter analyze --no-fatal-infos
+          flutter test test/common/tray_test.dart test/common/window_test.dart test/common/window_visibility_test.dart test/common/protocol_test.dart test/common/launch_test.dart --reporter compact
+      - name: Build installers
+        env:
+          ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
+          BUILD_PLATFORM: ${{ matrix.platform }}
+          BUILD_ARCH: ${{ matrix.arch }}
+        run: |
+          if test "$RUNNER_OS" = Windows; then
+            export PATH="${PUB_CACHE:-$LOCALAPPDATA/Pub/Cache}/bin:$PATH"
+          else
+            export PATH="${PUB_CACHE:-$HOME/.pub-cache}/bin:$PATH"
+          fi
+          df -h .
+          if test "$BUILD_PLATFORM" = android; then
+            dart setup.dart android --arch "$BUILD_ARCH" --env pre
+          else
+            dart setup.dart "$BUILD_PLATFORM" --env pre
+          fi
+      - name: Remove signing material
+        if: always() && matrix.platform == 'android'
+        run: rm -f android/app/keystore.jks android/local.properties
+      - uses: actions/upload-artifact@v4
+        with:
+          name: StackSpire-${{ matrix.platform }}-${{ matrix.arch }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            CI-BUILD-INFO.txt
+            dist/**/*.apk
+            dist/**/*.exe
+            dist/**/*.zip
+            dist/**/*.deb
+            dist/**/*.rpm
+            dist/**/*.AppImage
+  macos:
+    uses: ./.github/workflows/stackspire-macos.yml
+    with:
+      architecture: both

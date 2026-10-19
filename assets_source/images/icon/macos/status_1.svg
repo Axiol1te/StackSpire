@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="27 25 54 57">
+  <title>StackSpire menu bar</title>
+  <defs>
+    <mask id="gap" maskUnits="userSpaceOnUse" x="20" y="20" width="70" height="70">
+      <rect x="20" y="20" width="70" height="70" fill="white"/>
+      <path transform="rotate(-12 61 57)" d="M67.01 42.49 A8.5 8.5 0 1 0 61 57 A8.5 8.5 0 1 1 54.99 71.51" fill="none" stroke="black" stroke-width="11" stroke-linecap="round"/>
+    </mask>
+  </defs>
+  <g fill="none" stroke="black" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <g mask="url(#gap)">
+      <path transform="rotate(-12 47 51)" d="M53.01 36.49 A8.5 8.5 0 1 0 47 51 A8.5 8.5 0 1 1 40.99 65.51"/>
+    </g>
+    <path transform="rotate(-12 61 57)" d="M67.01 42.49 A8.5 8.5 0 1 0 61 57 A8.5 8.5 0 1 1 54.99 71.51"/>
+  </g>
+</svg>

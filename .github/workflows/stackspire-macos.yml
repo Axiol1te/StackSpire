@@ -1,0 +1,125 @@
+name: StackSpire macOS
+
+on:
+  workflow_call:
+    inputs:
+      architecture:
+        default: both
+        type: string
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: Mac architecture
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - arm64
+          - amd64
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stackspire-macos-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.architecture == 'arm64' && '[{"arch":"arm64","runner":"macos-15"}]' || inputs.architecture == 'amd64' && '[{"arch":"amd64","runner":"macos-15-intel"}]' || '[{"arch":"arm64","runner":"macos-15"},{"arch":"amd64","runner":"macos-15-intel"}]') }}
+    env:
+      CARGO_BUILD_JOBS: 2
+      GOMAXPROCS: 2
+      GOFLAGS: -p=2
+    steps:
+      - name: Checkout complete project
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.27.1
+          cache-dependency-path: core/go.sum
+      - name: Assign increasing CI build number
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const number = 2026104000 + Number(process.env.GITHUB_RUN_NUMBER);
+            const source = fs.readFileSync('pubspec.yaml', 'utf8');
+            if (!/^version: \S+\+\d+$/m.test(source)) throw new Error('Missing app version');
+            fs.writeFileSync('pubspec.yaml', source.replace(/^(version: \S+\+)\d+$/m, (_, prefix) => prefix + number));
+
+      - name: Select Xcode
+        run: |
+          for app in /Applications/Xcode_26.3.app /Applications/Xcode_26.2.app; do
+            if test -d "$app"; then
+              sudo xcode-select -s "$app/Contents/Developer"
+              break
+            fi
+          done
+          xcodebuild -version
+
+      - name: Set up pinned Flutter and Rust
+        run: |
+          git clone --depth 1 --branch 3.47.6 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          export PATH="$RUNNER_TEMP/flutter/bin:$PATH"
+          flutter config --no-analytics --enable-macos-desktop
+          flutter precache --macos
+          rustup update stable --no-self-update
+          rustup default stable
+          flutter --version
+          rustc --version
+
+      - name: Disable Impeller on Intel
+        if: matrix.arch == 'amd64'
+        run: plutil -replace FLTEnableImpeller -bool NO macos/Runner/Info.plist
+
+      - name: Resolve and validate
+        run: |
+          flutter pub get
+          flutter analyze --no-fatal-infos
+          flutter test test/common/tray_test.dart test/common/window_test.dart test/common/window_visibility_test.dart test/common/protocol_test.dart test/common/launch_test.dart --reporter compact
+
+      - name: Build app and DMG
+        run: |
+          export PATH="${PUB_CACHE:-$HOME/.pub-cache}/bin:$PATH"
+          dart setup.dart macos --env pre
+
+      - name: Verify bundle and create portable ZIP
+        env:
+          BUILD_ARCH: ${{ matrix.arch }}
+        run: |
+          app=build/macos/Build/Products/Release/StackSpire.app
+          test -d "$app"
+          test "$(/usr/libexec/PlistBuddy -c 'Print CFBundleName' "$app/Contents/Info.plist")" = StackSpire
+          arch=arm64
+          if test "$BUILD_ARCH" = amd64; then arch=x86_64; fi
+          lipo "$app/Contents/MacOS/StackSpire" -verify_arch "$arch"
+          lipo "$app/Contents/MacOS/FlClashCore" -verify_arch "$arch"
+          codesign --verify --deep --strict "$app"
+          ditto -c -k --sequesterRsrc --keepParent "$app" "dist/StackSpire-macos-$BUILD_ARCH.zip"
+          printf 'commit=%s\narchitecture=%s\nsigning=ad-hoc\nnotarized=false\n' "$GITHUB_SHA" "$BUILD_ARCH" > "dist/build-info-$BUILD_ARCH.txt"
+          shasum -a 256 dist/*.dmg dist/*.zip > "dist/SHA256SUMS-$BUILD_ARCH.txt"
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: StackSpire-macos-${{ matrix.arch }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            dist/*.dmg
+            dist/*.zip
+            dist/build-info-*.txt
+            dist/SHA256SUMS-*.txt

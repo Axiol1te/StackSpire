@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="shortcut_background">#2C6A99</color>
+    <color name="ss_window">#F6F3EE</color>
+    <color name="ss_splash_icon_background">#0C0A09</color>
+</resources>

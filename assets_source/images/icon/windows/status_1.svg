@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="27 25 54 57">
+  <title>StackSpire</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path transform="rotate(-12 47 51)" d="M53.01 36.49 A8.5 8.5 0 1 0 47 51 A8.5 8.5 0 1 1 40.99 65.51" stroke="#9CA3AF" stroke-width="6"/>
+    <path transform="rotate(-12 61 57)" d="M67.01 42.49 A8.5 8.5 0 1 0 61 57 A8.5 8.5 0 1 1 54.99 71.51" stroke="#0C0A09" stroke-width="11"/>
+    <path transform="rotate(-12 61 57)" d="M67.01 42.49 A8.5 8.5 0 1 0 61 57 A8.5 8.5 0 1 1 54.99 71.51" stroke="#9CA3AF" stroke-width="6"/>
+  </g>
+</svg>
