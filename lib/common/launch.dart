@@ -12,7 +12,7 @@ class AutoLaunch {
 
   AutoLaunch._internal() {
     launcher.setup(
-      appName: system.isLinux ? appDisplayName : appName,
+      appName: appDisplayName,
       appPath: Platform.resolvedExecutable,
     );
   }

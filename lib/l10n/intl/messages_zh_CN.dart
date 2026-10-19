@@ -25,7 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m1(detail) => "清除数据失败：${detail}";
 
   static String m2(code) =>
-      "Windows 拒绝运行 FlClashCore.exe（错误 ${code}）。智能应用控制、AppLocker 等应用控制策略会拦截未签名程序，请在该策略中放行 FlClash 或关闭策略后重试。";
+      "Windows 拒绝运行 StackSpire（错误 ${code}）。智能应用控制、AppLocker 等应用控制策略会拦截未签名程序，请在该策略中放行 StackSpire 或关闭策略后重试。";
 
   static String m3(name) =>
       "应用连续两次未能完成启动。为打断崩溃循环，已取消选中配置 ${name}，并跳过本次自动配置，你可以随时重新选中它。";
@@ -401,7 +401,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "core": MessageLookupByLibrary.simpleMessage("内核"),
     "coreBlockedByPolicyTip": m2,
     "coreBlockedBySmartAppControlTip": MessageLookupByLibrary.simpleMessage(
-      "Windows 智能应用控制拦截了未签名的 FlClashCore.exe。请打开 Windows 安全中心 → 应用和浏览器控制 → 智能应用控制设置，选择「关闭」后重新启动 FlClash。智能应用控制关闭后无法再开启，除非重装 Windows。",
+      "Windows 智能应用控制拦截了未签名的 StackSpire。请打开 Windows 安全中心 → 应用和浏览器控制 → 智能应用控制设置，选择「关闭」后重新启动 StackSpire。智能应用控制关闭后无法再开启，除非重装 Windows。",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("核心状态"),
     "country": MessageLookupByLibrary.simpleMessage("区域"),
@@ -499,7 +499,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "disclaimerChangesTitle": MessageLookupByLibrary.simpleMessage("声明变更"),
     "disclaimerDesc": MessageLookupByLibrary.simpleMessage(
-      "在使用 FlClash（以下简称“本软件”）前，请仔细阅读并充分理解本声明的全部内容。点击“同意”即表示你已阅读、理解并接受以下全部条款；如不同意，请点击“退出”并停止使用本软件。",
+      "在使用 StackSpire（以下简称“本软件”）前，请仔细阅读并充分理解本声明的全部内容。点击“同意”即表示你已阅读、理解并接受以下全部条款；如不同意，请点击“退出”并停止使用本软件。",
     ),
     "disclaimerLiabilityContent": MessageLookupByLibrary.simpleMessage(
       "在适用法律允许的最大范围内，开发者及所有贡献者均不对因使用或无法使用本软件而产生的任何直接、间接、偶然、特殊、惩罚性或后果性损害承担责任，包括但不限于数据丢失、设备损坏、网络异常、业务中断、利润损失或因此引起的任何法律纠纷，即使已被告知发生此类损害的可能性。",
@@ -672,7 +672,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "hashByInUser": MessageLookupByLibrary.simpleMessage("按入站用户哈希"),
     "healthCheck": MessageLookupByLibrary.simpleMessage("健康检查"),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
-      "Helper 服务不可用，无法启用 TUN 模式，请重新安装 FlClash。",
+      "Helper 服务不可用，无法启用 TUN 模式，请重新安装 StackSpire。",
     ),
     "hex": MessageLookupByLibrary.simpleMessage("十六进制"),
     "hideFromList": MessageLookupByLibrary.simpleMessage("从列表中隐藏"),
@@ -732,7 +732,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "init": MessageLookupByLibrary.simpleMessage("初始化"),
     "initFailed": MessageLookupByLibrary.simpleMessage("启动失败"),
     "initFailedTip": MessageLookupByLibrary.simpleMessage(
-      "FlClash 启动时出错，无法继续运行。可以复制错误详情用于反馈；如果问题反复出现，清除数据后通常可以重新启动。",
+      "StackSpire 启动时出错，无法继续运行。可以复制错误详情用于反馈；如果问题反复出现，清除数据后通常可以重新启动。",
     ),
     "initiator": MessageLookupByLibrary.simpleMessage("发起方"),
     "initiatorShort": MessageLookupByLibrary.simpleMessage("发起"),
@@ -1331,7 +1331,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "splitStrategy": MessageLookupByLibrary.simpleMessage("分流策略"),
     "splitStrategyNotEmpty": MessageLookupByLibrary.simpleMessage("分流策略不能为空"),
     "ssAboutText": MessageLookupByLibrary.simpleMessage(
-      "StackSpire 是基于 FlClash 与 Mihomo 内核的 VPN 客户端，以 GPL-3.0 许可发布的自由软件。",
+      "StackSpire — a personal VPN client with a custom interface, subscription profiles and flexible routing.",
     ),
     "ssAccountPage": MessageLookupByLibrary.simpleMessage("个人中心"),
     "ssActivityAccent": MessageLookupByLibrary.simpleMessage("详情"),
@@ -1352,7 +1352,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ssClipboardNoLink": MessageLookupByLibrary.simpleMessage("剪贴板中没有链接"),
     "ssConnecting": MessageLookupByLibrary.simpleMessage("正在连接"),
     "ssConnectionsDesc": MessageLookupByLibrary.simpleMessage("当前连接，可关闭或阻止"),
-    "ssCoreFork": MessageLookupByLibrary.simpleMessage("FlClash 使用的内核分支"),
+    "ssCoreFork": MessageLookupByLibrary.simpleMessage("StackSpire 使用的内核分支"),
     "ssCoreParams": MessageLookupByLibrary.simpleMessage("端口与内核"),
     "ssCoreParamsDesc": MessageLookupByLibrary.simpleMessage(
       "端口、局域网、控制器、测试地址、hosts、日志与更新",
@@ -1397,7 +1397,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ssLaunch": MessageLookupByLibrary.simpleMessage("启动"),
     "ssLicense": MessageLookupByLibrary.simpleMessage("许可证"),
     "ssLicenseDesc": MessageLookupByLibrary.simpleMessage(
-      "你可以依据 GPL-3.0 使用、研究、修改和分享本程序。其源代码为 FlClash 代码加上 StackSpire 界面。",
+      "You may use, study, modify and share this program under the GNU GPL v3.",
     ),
     "ssModeDirect": MessageLookupByLibrary.simpleMessage("直连"),
     "ssModeRule": MessageLookupByLibrary.simpleMessage("规则"),

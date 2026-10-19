@@ -2,7 +2,7 @@ display_name: StackSpire
 package_name: stackspire
 maintainer:
   name: StackSpire
-  email: chen08209@gmail.com
+  email: Axiol1te@users.noreply.github.com
 
 priority: optional
 section: x11
@@ -23,6 +23,7 @@ postuninstall_scripts:
   - 'systemctl daemon-reload >/dev/null 2>&1 || true'
 
 supported_mime_type:
+  - x-scheme-handler/stackspire
   - x-scheme-handler/clash
   - x-scheme-handler/clashmeta
   - x-scheme-handler/flclash
@@ -40,4 +41,4 @@ categories:
 
 startup_notify: true
 
-startup_wm_class: com.follow.clash
+startup_wm_class: com.stackspire.vpn

@@ -1,7 +1,7 @@
 display_name: StackSpire
 
 packager: StackSpire
-packagerEmail: chen08209@gmail.com
+packagerEmail: Axiol1te@users.noreply.github.com
 license: GPL-3.0-only
 
 priority: optional
@@ -31,6 +31,7 @@ postuninstall_scripts:
   - 'systemctl daemon-reload >/dev/null 2>&1 || true'
 
 supported_mime_type:
+  - x-scheme-handler/stackspire
   - x-scheme-handler/clash
   - x-scheme-handler/clashmeta
   - x-scheme-handler/flclash
@@ -47,4 +48,4 @@ group: Applications/Internet
 
 startup_notify: true
 
-startup_wm_class: com.follow.clash
+startup_wm_class: com.stackspire.vpn

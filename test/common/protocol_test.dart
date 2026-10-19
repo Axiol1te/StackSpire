@@ -27,7 +27,7 @@ void main() {
     test('writes a hidden desktop entry claiming every scheme', () {
       expect(
         plan.desktopPath,
-        '/home/me/.local/share/applications/flclash-url-handler.desktop',
+        '/home/me/.local/share/applications/stackspire-url-handler.desktop',
       );
       expect(
         plan.desktopEntry,
@@ -36,7 +36,7 @@ void main() {
         'Name=StackSpire\n'
         'NoDisplay=true\n'
         'Exec="/home/me/Apps/FlClash.AppImage" %u\n'
-        'MimeType=x-scheme-handler/clash;x-scheme-handler/clashmeta;'
+        'MimeType=x-scheme-handler/stackspire;x-scheme-handler/clash;x-scheme-handler/clashmeta;'
         'x-scheme-handler/flclash;\n',
       );
     });
@@ -44,7 +44,8 @@ void main() {
     test('makes the entry the default handler for every scheme', () {
       expect(plan.xdgMimeArguments, [
         'default',
-        'flclash-url-handler.desktop',
+        'stackspire-url-handler.desktop',
+        'x-scheme-handler/stackspire',
         'x-scheme-handler/clash',
         'x-scheme-handler/clashmeta',
         'x-scheme-handler/flclash',

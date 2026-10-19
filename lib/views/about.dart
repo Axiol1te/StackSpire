@@ -96,14 +96,8 @@ class AboutView extends ConsumerWidget {
               _buildLinkItem(
                 glyph: AppGlyphs.cpu,
                 title: appLocalizations.core,
-                url: 'https://github.com/chen08209/Clash.Meta/tree/FlClash',
-                label: 'github.com/chen08209/Clash.Meta',
-              ),
-              _buildLinkItem(
-                glyph: AppGlyphs.send,
-                title: 'Telegram',
-                url: 'https://t.me/FlClash',
-                label: 't.me/FlClash',
+                url: 'https://github.com/MetaCubeX/mihomo',
+                label: 'github.com/MetaCubeX/mihomo',
               ),
             ],
           ),
@@ -158,7 +152,7 @@ class _AboutHero extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(_logoInset),
                 child: Image.asset(
-                  'assets/images/icon.png',
+                  'assets/images/stackspire_icon.png',
                   width: _logoSize - _logoInset * 2,
                   height: _logoSize - _logoInset * 2,
                 ),

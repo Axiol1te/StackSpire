@@ -1,17 +1,22 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:width="240dp"
-    android:height="240dp"
-    android:viewportWidth="240"
-    android:viewportHeight="240"
-    tools:ignore="VectorRaster">
-  <path
-      android:pathData="M48.1,80.89L168.44,11.41A23.16,23.16 0,0 1,191.6,51.53L71.26,121.01A23.16,23.16 0,0 1,48.1,80.89Z"
-      android:fillColor="#6666FB"/>
-  <path
-      android:pathData="M78.98,134.37L139.16,99.63A23.16,23.16 0,0 1,162.32,139.75L102.14,174.49A23.16,23.16 0,0 1,78.98,134.37Z"
-      android:fillColor="#336AB6"/>
-  <path
-      android:pathData="M98.28,207.92A23.16,23.16 0,1 1,144.6,207.92A23.16,23.16 0,1 1,98.28,207.92Z"
-      android:fillColor="#5CA8E9"/>
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <group android:rotation="-12" android:pivotX="18" android:pivotY="21">
+        <path
+            android:pathData="M24.01,6.49 A8.5,8.5 0 1,0 18,21 A8.5,8.5 0 1,1 11.99,35.51"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+    <group android:rotation="-12" android:pivotX="32" android:pivotY="27">
+        <path
+            android:pathData="M38.01,12.49 A8.5,8.5 0 1,0 32,27 A8.5,8.5 0 1,1 25.99,41.51"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
 </vector>

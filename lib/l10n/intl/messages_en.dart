@@ -26,7 +26,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m1(detail) => "Couldn\'t clear the data: ${detail}";
 
   static String m2(code) =>
-      "Windows refused to run FlClashCore.exe (error ${code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow FlClash in that policy or turn it off, then try again.";
+      "Windows refused to run StackSpire (error ${code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow StackSpire in that policy or turn it off, then try again.";
 
   static String m3(name) =>
       "The app failed to finish launching twice in a row. To break the loop, the profile ${name} has been deselected and automatic setup was skipped. You can select it again at any time.";
@@ -511,7 +511,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "core": MessageLookupByLibrary.simpleMessage("Core"),
     "coreBlockedByPolicyTip": m2,
     "coreBlockedBySmartAppControlTip": MessageLookupByLibrary.simpleMessage(
-      "Windows Smart App Control blocked FlClashCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start FlClash again. Smart App Control cannot be turned back on without reinstalling Windows.",
+      "Windows Smart App Control blocked StackSpire because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start StackSpire again. Smart App Control cannot be turned back on without reinstalling Windows.",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("Core status"),
     "country": MessageLookupByLibrary.simpleMessage("Region"),
@@ -637,7 +637,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Changes to this statement",
     ),
     "disclaimerDesc": MessageLookupByLibrary.simpleMessage(
-      "Before using FlClash (\"the Software\"), please read this statement carefully and make sure you understand all of it. Tapping \"Agree\" means you have read, understood, and accept every term below. If you do not agree, tap \"Exit\" and stop using the Software.",
+      "Before using StackSpire (\"the Software\"), please read this statement carefully and make sure you understand all of it. Tapping \"Agree\" means you have read, understood, and accept every term below. If you do not agree, tap \"Exit\" and stop using the Software.",
     ),
     "disclaimerLiabilityContent": MessageLookupByLibrary.simpleMessage(
       "To the maximum extent permitted by applicable law, neither the developers nor any contributor shall be liable for any direct, indirect, incidental, special, punitive, or consequential damages arising from the use of or inability to use the Software, including but not limited to data loss, device damage, network failures, business interruption, lost profits, or any resulting legal dispute, even if advised of the possibility of such damages.",
@@ -868,7 +868,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "healthCheck": MessageLookupByLibrary.simpleMessage("Health check"),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
-      "Helper service unavailable; TUN mode cannot be enabled. Reinstall FlClash to restore it.",
+      "Helper service unavailable; TUN mode cannot be enabled. Reinstall StackSpire to restore it.",
     ),
     "hex": MessageLookupByLibrary.simpleMessage("Hex"),
     "hideFromList": MessageLookupByLibrary.simpleMessage("Hide from list"),
@@ -938,7 +938,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "init": MessageLookupByLibrary.simpleMessage("Init"),
     "initFailed": MessageLookupByLibrary.simpleMessage("Startup failed"),
     "initFailedTip": MessageLookupByLibrary.simpleMessage(
-      "FlClash ran into an error while starting and can\'t continue. Copy the details to report the problem. If it keeps happening, clearing the data usually lets the app start again.",
+      "StackSpire ran into an error while starting and can\'t continue. Copy the details to report the problem. If it keeps happening, clearing the data usually lets the app start again.",
     ),
     "initiator": MessageLookupByLibrary.simpleMessage("Initiator"),
     "initiatorShort": MessageLookupByLibrary.simpleMessage("From"),
@@ -1718,7 +1718,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Split strategy cannot be empty",
     ),
     "ssAboutText": MessageLookupByLibrary.simpleMessage(
-      "StackSpire is a VPN client built on FlClash and the Mihomo core. Free software under the GPL-3.0 licence.",
+      "StackSpire — a personal VPN client with a custom interface, subscription profiles and flexible routing.",
     ),
     "ssAccountPage": MessageLookupByLibrary.simpleMessage("Account page"),
     "ssActivityAccent": MessageLookupByLibrary.simpleMessage("in detail"),
@@ -1748,7 +1748,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Open connections, close or block them",
     ),
     "ssCoreFork": MessageLookupByLibrary.simpleMessage(
-      "Core fork used by FlClash",
+      "Core fork used by StackSpire",
     ),
     "ssCoreParams": MessageLookupByLibrary.simpleMessage("Ports and core"),
     "ssCoreParamsDesc": MessageLookupByLibrary.simpleMessage(
@@ -1804,7 +1804,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ssLaunch": MessageLookupByLibrary.simpleMessage("Launch"),
     "ssLicense": MessageLookupByLibrary.simpleMessage("Licence"),
     "ssLicenseDesc": MessageLookupByLibrary.simpleMessage(
-      "You may use, study, change and share this program under the GPL-3.0. Its source is the FlClash code plus the StackSpire interface.",
+      "You may use, study, modify and share this program under the GNU GPL v3.",
     ),
     "ssModeDirect": MessageLookupByLibrary.simpleMessage("Direct"),
     "ssModeRule": MessageLookupByLibrary.simpleMessage("Rules"),

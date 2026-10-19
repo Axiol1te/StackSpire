@@ -14,8 +14,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 
 const _links = (
-  flclash: 'https://github.com/chen08209/FlClash',
-  core: 'https://github.com/chen08209/Clash.Meta/tree/FlClash',
+  project: 'https://github.com/$repository',
   mihomo: 'https://github.com/MetaCubeX/mihomo',
   license: 'https://www.gnu.org/licenses/gpl-3.0.html',
 );
@@ -96,18 +95,6 @@ class _SsAboutPageState extends ConsumerState<SsAboutPage> {
           title: l.ssCredits,
           children: [
             SsRow(
-              icon: LucideIcons.heart,
-              iconColor: palette.rose,
-              title: 'FlClash',
-              subtitle: l.ssCreditFlClash,
-              trailing: Icon(
-                LucideIcons.externalLink,
-                size: 16,
-                color: palette.textFaint,
-              ),
-              onTap: () => dialogs.openUrl(_links.flclash),
-            ),
-            SsRow(
               icon: LucideIcons.cpu,
               iconColor: palette.sky,
               title: 'Mihomo (Clash.Meta)',
@@ -118,18 +105,6 @@ class _SsAboutPageState extends ConsumerState<SsAboutPage> {
                 color: palette.textFaint,
               ),
               onTap: () => dialogs.openUrl(_links.mihomo),
-            ),
-            SsRow(
-              icon: LucideIcons.gitBranch,
-              iconColor: palette.lavender,
-              title: l.ssCoreFork,
-              subtitle: 'github.com/chen08209/Clash.Meta',
-              trailing: Icon(
-                LucideIcons.externalLink,
-                size: 16,
-                color: palette.textFaint,
-              ),
-              onTap: () => dialogs.openUrl(_links.core),
             ),
           ],
         ),
@@ -153,13 +128,13 @@ class _SsAboutPageState extends ConsumerState<SsAboutPage> {
               icon: LucideIcons.code,
               iconColor: palette.sky,
               title: l.ssSourceCode,
-              subtitle: 'github.com/chen08209/FlClash',
+              subtitle: 'github.com/$repository',
               trailing: Icon(
                 LucideIcons.externalLink,
                 size: 16,
                 color: palette.textFaint,
               ),
-              onTap: () => dialogs.openUrl(_links.flclash),
+              onTap: () => dialogs.openUrl(_links.project),
             ),
             SsRow(
               icon: LucideIcons.fileText,
@@ -170,7 +145,7 @@ class _SsAboutPageState extends ConsumerState<SsAboutPage> {
                 context: context,
                 applicationName: ssAppName,
                 applicationVersion: version,
-                applicationLegalese: 'GPL-3.0 · based on FlClash',
+                applicationLegalese: 'StackSpire · GPL-3.0',
               ),
             ),
           ],

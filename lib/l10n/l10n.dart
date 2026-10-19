@@ -2370,10 +2370,10 @@ class AppLocalizations {
     return Intl.message('Disclaimer', name: 'disclaimer', desc: '', args: []);
   }
 
-  /// `Before using FlClash ("the Software"), please read this statement carefully and make sure you understand all of it. Tapping "Agree" means you have read, understood, and accept every term below. If you do not agree, tap "Exit" and stop using the Software.`
+  /// `Before using StackSpire ("the Software"), please read this statement carefully and make sure you understand all of it. Tapping "Agree" means you have read, understood, and accept every term below. If you do not agree, tap "Exit" and stop using the Software.`
   String get disclaimerDesc {
     return Intl.message(
-      'Before using FlClash ("the Software"), please read this statement carefully and make sure you understand all of it. Tapping "Agree" means you have read, understood, and accept every term below. If you do not agree, tap "Exit" and stop using the Software.',
+      'Before using StackSpire ("the Software"), please read this statement carefully and make sure you understand all of it. Tapping "Agree" means you have read, understood, and accept every term below. If you do not agree, tap "Exit" and stop using the Software.',
       name: 'disclaimerDesc',
       desc: '',
       args: [],
@@ -4760,10 +4760,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Helper service unavailable; TUN mode cannot be enabled. Reinstall FlClash to restore it.`
+  /// `Helper service unavailable; TUN mode cannot be enabled. Reinstall StackSpire to restore it.`
   String get helperCorruptTip {
     return Intl.message(
-      'Helper service unavailable; TUN mode cannot be enabled. Reinstall FlClash to restore it.',
+      'Helper service unavailable; TUN mode cannot be enabled. Reinstall StackSpire to restore it.',
       name: 'helperCorruptTip',
       desc: '',
       args: [],
@@ -4790,20 +4790,20 @@ class AppLocalizations {
     );
   }
 
-  /// `Windows refused to run FlClashCore.exe (error {code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow FlClash in that policy or turn it off, then try again.`
+  /// `Windows refused to run StackSpire (error {code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow StackSpire in that policy or turn it off, then try again.`
   String coreBlockedByPolicyTip(Object code) {
     return Intl.message(
-      'Windows refused to run FlClashCore.exe (error $code). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow FlClash in that policy or turn it off, then try again.',
+      'Windows refused to run StackSpire (error $code). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow StackSpire in that policy or turn it off, then try again.',
       name: 'coreBlockedByPolicyTip',
       desc: '',
       args: [code],
     );
   }
 
-  /// `Windows Smart App Control blocked FlClashCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start FlClash again. Smart App Control cannot be turned back on without reinstalling Windows.`
+  /// `Windows Smart App Control blocked StackSpire because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start StackSpire again. Smart App Control cannot be turned back on without reinstalling Windows.`
   String get coreBlockedBySmartAppControlTip {
     return Intl.message(
-      'Windows Smart App Control blocked FlClashCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start FlClash again. Smart App Control cannot be turned back on without reinstalling Windows.',
+      'Windows Smart App Control blocked StackSpire because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start StackSpire again. Smart App Control cannot be turned back on without reinstalling Windows.',
       name: 'coreBlockedBySmartAppControlTip',
       desc: '',
       args: [],
@@ -6848,10 +6848,10 @@ class AppLocalizations {
     );
   }
 
-  /// `FlClash ran into an error while starting and can't continue. Copy the details to report the problem. If it keeps happening, clearing the data usually lets the app start again.`
+  /// `StackSpire ran into an error while starting and can't continue. Copy the details to report the problem. If it keeps happening, clearing the data usually lets the app start again.`
   String get initFailedTip {
     return Intl.message(
-      'FlClash ran into an error while starting and can\'t continue. Copy the details to report the problem. If it keeps happening, clearing the data usually lets the app start again.',
+      'StackSpire ran into an error while starting and can\'t continue. Copy the details to report the problem. If it keeps happening, clearing the data usually lets the app start again.',
       name: 'initFailedTip',
       desc: '',
       args: [],
@@ -8477,10 +8477,10 @@ class AppLocalizations {
     );
   }
 
-  /// `StackSpire is a VPN client built on FlClash and the Mihomo core. Free software under the GPL-3.0 licence.`
+  /// `StackSpire — a personal VPN client with a custom interface, subscription profiles and flexible routing.`
   String get ssAboutText {
     return Intl.message(
-      'StackSpire is a VPN client built on FlClash and the Mihomo core. Free software under the GPL-3.0 licence.',
+      'StackSpire — a personal VPN client with a custom interface, subscription profiles and flexible routing.',
       name: 'ssAboutText',
       desc: '',
       args: [],
@@ -8512,10 +8512,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Core fork used by FlClash`
+  /// `Core fork used by StackSpire`
   String get ssCoreFork {
     return Intl.message(
-      'Core fork used by FlClash',
+      'Core fork used by StackSpire',
       name: 'ssCoreFork',
       desc: '',
       args: [],
@@ -8527,10 +8527,10 @@ class AppLocalizations {
     return Intl.message('Licence', name: 'ssLicense', desc: '', args: []);
   }
 
-  /// `You may use, study, change and share this program under the GPL-3.0. Its source is the FlClash code plus the StackSpire interface.`
+  /// `You may use, study, modify and share this program under the GNU GPL v3.`
   String get ssLicenseDesc {
     return Intl.message(
-      'You may use, study, change and share this program under the GPL-3.0. Its source is the FlClash code plus the StackSpire interface.',
+      'You may use, study, modify and share this program under the GNU GPL v3.',
       name: 'ssLicenseDesc',
       desc: '',
       args: [],

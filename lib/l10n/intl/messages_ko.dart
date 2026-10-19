@@ -25,7 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m1(detail) => "데이터를 지우지 못했습니다: ${detail}";
 
   static String m2(code) =>
-      "Windows에서 FlClashCore.exe 실행을 거부했습니다(오류 ${code}). Smart App Control이나 AppLocker와 같은 앱 제어 정책이 서명되지 않은 프로그램을 차단합니다. 해당 정책에서 FlClash를 허용하거나 정책을 끈 후 다시 시도하세요.";
+      "Windows에서 StackSpire 실행을 거부했습니다(오류 ${code}). Smart App Control이나 AppLocker와 같은 앱 제어 정책이 서명되지 않은 프로그램을 차단합니다. 해당 정책에서 StackSpire를 허용하거나 정책을 끈 후 다시 시도하세요.";
 
   static String m3(name) =>
       "앱이 두 번 연속 시작을 완료하지 못했습니다. 반복을 끊기 위해 프로필 ${name}의 선택을 해제하고 자동 설정을 건너뛰었습니다. 언제든지 다시 선택할 수 있습니다.";
@@ -421,7 +421,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "core": MessageLookupByLibrary.simpleMessage("코어"),
     "coreBlockedByPolicyTip": m2,
     "coreBlockedBySmartAppControlTip": MessageLookupByLibrary.simpleMessage(
-      "서명되지 않아 Windows Smart App Control이 FlClashCore.exe를 차단했습니다. Windows 보안 → 앱 및 브라우저 컨트롤 → Smart App Control 설정에서 끔을 선택한 후 FlClash를 다시 시작하세요. Smart App Control은 Windows를 다시 설치하지 않으면 다시 켤 수 없습니다.",
+      "서명되지 않아 Windows Smart App Control이 StackSpire를 차단했습니다. Windows 보안 → 앱 및 브라우저 컨트롤 → Smart App Control 설정에서 끔을 선택한 후 StackSpire를 다시 시작하세요. Smart App Control은 Windows를 다시 설치하지 않으면 다시 켤 수 없습니다.",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("코어 상태"),
     "country": MessageLookupByLibrary.simpleMessage("지역"),
@@ -531,7 +531,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "disclaimerChangesTitle": MessageLookupByLibrary.simpleMessage("본 문서의 변경"),
     "disclaimerDesc": MessageLookupByLibrary.simpleMessage(
-      "FlClash(이하 “본 소프트웨어”)를 사용하기 전에 이 문서를 주의 깊게 읽고 모든 내용을 이해했는지 확인하세요. “동의”를 누르면 아래 모든 조항을 읽고 이해했으며 수락한 것으로 간주합니다. 동의하지 않으면 “종료”를 누르고 본 소프트웨어의 사용을 중단하세요.",
+      "StackSpire(이하 “본 소프트웨어”)를 사용하기 전에 이 문서를 주의 깊게 읽고 모든 내용을 이해했는지 확인하세요. “동의”를 누르면 아래 모든 조항을 읽고 이해했으며 수락한 것으로 간주합니다. 동의하지 않으면 “종료”를 누르고 본 소프트웨어의 사용을 중단하세요.",
     ),
     "disclaimerLiabilityContent": MessageLookupByLibrary.simpleMessage(
       "관련 법률이 허용하는 최대 범위에서, 개발자와 기여자는 본 소프트웨어의 사용 또는 사용 불능으로 발생하는 직접, 간접, 부수적, 특별, 징벌적 또는 결과적 손해에 대해 책임을 지지 않습니다. 여기에는 데이터 손실, 기기 손상, 네트워크 장애, 사업 중단, 이익 손실 및 그로 인한 법적 분쟁이 포함되며 이에 국한되지 않고, 그러한 손해의 가능성을 사전에 통지받은 경우에도 마찬가지입니다.",
@@ -722,7 +722,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "hashByInUser": MessageLookupByLibrary.simpleMessage("인바운드 사용자별 해시"),
     "healthCheck": MessageLookupByLibrary.simpleMessage("상태 확인"),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
-      "헬퍼 서비스를 사용할 수 없어 TUN 모드를 켤 수 없습니다. FlClash를 다시 설치하여 복구하세요.",
+      "헬퍼 서비스를 사용할 수 없어 TUN 모드를 켤 수 없습니다. StackSpire를 다시 설치하여 복구하세요.",
     ),
     "hex": MessageLookupByLibrary.simpleMessage("16진수"),
     "hideFromList": MessageLookupByLibrary.simpleMessage("목록에서 숨기기"),
@@ -788,7 +788,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "init": MessageLookupByLibrary.simpleMessage("초기화"),
     "initFailed": MessageLookupByLibrary.simpleMessage("시작 실패"),
     "initFailedTip": MessageLookupByLibrary.simpleMessage(
-      "FlClash를 시작하는 중 오류가 발생하여 계속할 수 없습니다. 세부 정보를 복사하여 문제를 보고하세요. 문제가 계속되면 데이터를 지우면 대개 앱이 다시 시작됩니다.",
+      "StackSpire를 시작하는 중 오류가 발생하여 계속할 수 없습니다. 세부 정보를 복사하여 문제를 보고하세요. 문제가 계속되면 데이터를 지우면 대개 앱이 다시 시작됩니다.",
     ),
     "initiator": MessageLookupByLibrary.simpleMessage("요청자"),
     "initiatorShort": MessageLookupByLibrary.simpleMessage("출처"),
@@ -1447,7 +1447,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "분할 전략을 입력하세요",
     ),
     "ssAboutText": MessageLookupByLibrary.simpleMessage(
-      "StackSpire는 FlClash와 Mihomo 코어를 기반으로 한 VPN 클라이언트입니다. GPL-3.0 라이선스의 자유 소프트웨어입니다.",
+      "StackSpire — a personal VPN client with a custom interface, subscription profiles and flexible routing.",
     ),
     "ssAccountPage": MessageLookupByLibrary.simpleMessage("계정 페이지"),
     "ssActivityAccent": MessageLookupByLibrary.simpleMessage("상세 정보"),
@@ -1468,7 +1468,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "ssClipboardNoLink": MessageLookupByLibrary.simpleMessage("클립보드에 링크가 없습니다"),
     "ssConnecting": MessageLookupByLibrary.simpleMessage("연결 중"),
     "ssConnectionsDesc": MessageLookupByLibrary.simpleMessage("열린 연결 닫기 또는 차단"),
-    "ssCoreFork": MessageLookupByLibrary.simpleMessage("FlClash가 사용하는 코어 포크"),
+    "ssCoreFork": MessageLookupByLibrary.simpleMessage(
+      "StackSpire가 사용하는 코어 포크",
+    ),
     "ssCoreParams": MessageLookupByLibrary.simpleMessage("포트 및 코어"),
     "ssCoreParamsDesc": MessageLookupByLibrary.simpleMessage(
       "포트, LAN, 컨트롤러, 테스트 URL, hosts, 로그 및 업데이트",
@@ -1517,7 +1519,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ssLaunch": MessageLookupByLibrary.simpleMessage("실행"),
     "ssLicense": MessageLookupByLibrary.simpleMessage("라이선스"),
     "ssLicenseDesc": MessageLookupByLibrary.simpleMessage(
-      "GPL-3.0에 따라 이 프로그램을 사용, 연구, 수정 및 공유할 수 있습니다. 소스는 FlClash 코드와 StackSpire 인터페이스입니다.",
+      "You may use, study, modify and share this program under the GNU GPL v3.",
     ),
     "ssModeDirect": MessageLookupByLibrary.simpleMessage("직접"),
     "ssModeRule": MessageLookupByLibrary.simpleMessage("규칙"),
