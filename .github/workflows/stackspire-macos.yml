@@ -54,7 +54,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const number = 2026104000 + Number(process.env.GITHUB_RUN_NUMBER);
+            const number = 2026105000 + Number(process.env.GITHUB_RUN_NUMBER);
             const source = fs.readFileSync('pubspec.yaml', 'utf8');
             if (!/^version: \S+\+\d+$/m.test(source)) throw new Error('Missing app version');
             fs.writeFileSync('pubspec.yaml', source.replace(/^(version: \S+\+)\d+$/m, (_, prefix) => prefix + number));
