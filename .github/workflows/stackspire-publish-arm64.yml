@@ -1,0 +1,101 @@
+name: StackSpire publish ARM64
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful StackSpire build run containing both ARM64 artifacts
+        type: string
+        required: true
+      release_tag:
+        description: Existing release to receive the packages
+        type: string
+        default: v0.9.1
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stackspire-publish-arm64-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Validate source build and release
+        uses: actions/github-script@v7
+        env:
+          SOURCE_RUN: ${{ inputs.run_id }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        with:
+          script: |
+            if (!/^\d+$/.test(process.env.SOURCE_RUN)) throw new Error('Invalid build run id');
+            const source = (await github.rest.actions.getWorkflowRun({
+              ...context.repo, run_id: Number(process.env.SOURCE_RUN),
+            })).data;
+            if (source.head_repository.full_name !== `${context.repo.owner}/${context.repo.repo}` ||
+                source.head_branch !== 'main' || source.path !== '.github/workflows/stackspire-build.yml' ||
+                !['push', 'workflow_dispatch'].includes(source.event)) {
+              throw new Error('Expected a trusted main-branch StackSpire build');
+            }
+            const file = (await github.rest.repos.getContent({
+              ...context.repo, path: 'pubspec.yaml', ref: source.head_sha,
+            })).data;
+            const version = Buffer.from(file.content, 'base64').toString('utf8').match(/^version: (\S+)\+\d+$/m)?.[1];
+            if (!version || process.env.RELEASE_TAG !== `v${version}`) throw new Error('Release version mismatch');
+            const release = (await github.rest.repos.getReleaseByTag({
+              ...context.repo, tag: process.env.RELEASE_TAG,
+            })).data;
+            if (release.draft) throw new Error('Expected an already published release');
+            core.exportVariable('APP_VERSION', version);
+      - name: Wait for successful source build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_RUN: ${{ inputs.run_id }}
+        run: gh run watch "$SOURCE_RUN" --exit-status --interval 30
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id }}
+          name: StackSpire-linux-arm64
+          path: artifacts/linux
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id }}
+          name: StackSpire-windows-arm64
+          path: artifacts/windows
+      - name: Collect the five ARM64 packages
+        shell: python
+        run: |
+          import os, pathlib, shutil
+          version = os.environ['APP_VERSION']
+          expected = {
+              f'StackSpire-{version}-linux-arm64.{ext}' for ext in ['deb', 'rpm', 'AppImage']
+          } | {
+              f'StackSpire-{version}-windows-arm64-setup.exe',
+              f'StackSpire-{version}-windows-arm64.zip',
+          }
+          found = {}
+          for path in pathlib.Path('artifacts').rglob('*'):
+              if path.is_file() and path.name in expected:
+                  assert path.name not in found, f'Duplicate: {path.name}'
+                  found[path.name] = path
+          assert set(found) == expected, f'Missing packages: {expected - set(found)}'
+          output = pathlib.Path('release')
+          output.mkdir()
+          for name, source in found.items():
+              shutil.copyfile(source, output / name)
+      - name: Upload packages to existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: gh release upload "$RELEASE_TAG" release/* --clobber
