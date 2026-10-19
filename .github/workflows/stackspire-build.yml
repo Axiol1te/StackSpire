@@ -12,6 +12,11 @@ on:
       - '.gemini/**'
       - '.codex/**'
   workflow_dispatch:
+    inputs:
+      arm64_only:
+        description: Build only Windows and Linux ARM64 packages
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -28,22 +33,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: android
-            runner: ubuntu-24.04
-            arch: arm64
-          - platform: android
-            runner: ubuntu-24.04
-            arch: arm
-          - platform: android
-            runner: ubuntu-24.04
-            arch: amd64
-          - platform: windows
-            runner: windows-2022
-            arch: amd64
-          - platform: linux
-            runner: ubuntu-24.04
-            arch: amd64
+        include: >-
+          ${{ fromJSON(inputs.arm64_only &&
+              '[{"platform":"windows","runner":"windows-11-arm","arch":"arm64"},{"platform":"linux","runner":"ubuntu-24.04-arm","arch":"arm64"}]' ||
+              '[{"platform":"android","runner":"ubuntu-24.04","arch":"arm64"},{"platform":"android","runner":"ubuntu-24.04","arch":"arm"},{"platform":"android","runner":"ubuntu-24.04","arch":"amd64"},{"platform":"windows","runner":"windows-2022","arch":"amd64"},{"platform":"linux","runner":"ubuntu-24.04","arch":"amd64"},{"platform":"windows","runner":"windows-11-arm","arch":"arm64"},{"platform":"linux","runner":"ubuntu-24.04-arm","arch":"arm64"}]') }}
     defaults:
       run:
         shell: bash
@@ -81,10 +74,11 @@ jobs:
             if (!/^version: \S+\+\d+$/m.test(source)) throw new Error('Missing app version');
             fs.writeFileSync('pubspec.yaml', source.replace(/^(version: \S+\+)\d+$/m, (_, prefix) => prefix + number));
             fs.writeFileSync('CI-BUILD-INFO.txt', `commit=${context.sha}\nbuild=${number}\nrun=${context.runId}\n`);
+      # ARM hosts bootstrap the pinned stable tag; no matching SDK archive is published.
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.6
-          channel: stable
+          channel: ${{ matrix.arch == 'arm64' && matrix.platform != 'android' && 'master' || 'stable' }}
           cache: true
       - uses: actions/setup-java@v4
         if: matrix.platform == 'android'
@@ -97,6 +91,15 @@ jobs:
         with:
           ndk-version: r28c
           link-to-sdk: true
+      - name: Install native Rust on Windows ARM64
+        if: matrix.platform == 'windows' && matrix.arch == 'arm64'
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP 'rustup-init.exe'
+          Invoke-WebRequest -Uri 'https://win.rustup.rs/aarch64' -OutFile $installer
+          & $installer -y --default-toolchain stable
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Add-Content $env:GITHUB_PATH "$env:USERPROFILE\.cargo\bin"
       - name: Set up native toolchains
         run: |
           rustup update stable --no-self-update
@@ -135,6 +138,29 @@ jobs:
           else
             dart setup.dart "$BUILD_PLATFORM" --env pre
           fi
+      - name: Verify ARM64 application and native binaries
+        if: matrix.arch == 'arm64' && matrix.platform != 'android'
+        shell: python
+        env:
+          BUILD_PLATFORM: ${{ matrix.platform }}
+        run: |
+          import os, pathlib, struct
+          if os.environ['BUILD_PLATFORM'] == 'windows':
+              root = pathlib.Path('build/windows/arm64/runner/Release')
+              files = [root / name for name in ['StackSpire.exe', 'flutter_windows.dll', 'FlClashCore.exe', 'FlClashHelperService.exe']]
+              for path in files:
+                  data = path.read_bytes()
+                  pe = struct.unpack_from('<I', data, 0x3c)[0]
+                  assert data[pe:pe + 4] == b'PE\0\0', path
+                  assert struct.unpack_from('<H', data, pe + 4)[0] == 0xaa64, path
+          else:
+              root = pathlib.Path('build/linux/arm64/release/bundle')
+              files = [root / name for name in ['StackSpire', 'FlClashCore', 'FlClashHelperService', 'lib/libflutter_linux_gtk.so']]
+              for path in files:
+                  data = path.read_bytes()
+                  assert data[:4] == b'\x7fELF' and data[4] == 2 and data[5] == 1, path
+                  assert struct.unpack_from('<H', data, 18)[0] == 183, path
+          print('Verified native ARM64 architecture for app, Flutter engine, Core and Helper')
       - name: Remove signing material
         if: always() && matrix.platform == 'android'
         run: rm -f android/app/keystore.jks android/local.properties
@@ -152,6 +178,7 @@ jobs:
             dist/**/*.rpm
             dist/**/*.AppImage
   macos:
+    if: ${{ !inputs.arm64_only }}
     uses: ./.github/workflows/stackspire-macos.yml
     with:
       architecture: both
@@ -176,14 +203,15 @@ jobs:
               'StackSpire-android-arm64', 'StackSpire-android-arm',
               'StackSpire-android-amd64', 'StackSpire-windows-amd64',
               'StackSpire-linux-amd64', 'StackSpire-macos-arm64',
-              'StackSpire-macos-amd64',
+              'StackSpire-macos-amd64', 'StackSpire-windows-arm64',
+              'StackSpire-linux-arm64',
           }
           assert {p.name for p in root.iterdir() if p.is_dir()} == expected
           output = pathlib.Path('release')
           output.mkdir()
           extensions = {'.apk', '.exe', '.zip', '.deb', '.rpm', '.AppImage', '.dmg'}
           for artifact in sorted(root.iterdir()):
-              packages = [p for p in artifact.rglob('*') if p.is_file() and p.suffix in extensions]
+              packages = [p for p in artifact.rglob('*') if p.is_file() and p.suffix in extensions and not (artifact.name.startswith('StackSpire-macos-') and p.suffix == '.zip')]
               assert packages, f'No package in {artifact}'
               for package in packages:
                   destination = output / package.name
