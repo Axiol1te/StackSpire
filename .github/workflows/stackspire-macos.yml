@@ -56,6 +56,7 @@ jobs:
             const fs = require('fs');
             const number = 2026105000 + Number(process.env.GITHUB_RUN_NUMBER);
             const source = fs.readFileSync('pubspec.yaml', 'utf8');
+            core.exportVariable('STACKSPIRE_VERSION', source.match(/^version: (\S+)\+\d+$/m)[1]);
             if (!/^version: \S+\+\d+$/m.test(source)) throw new Error('Missing app version');
             fs.writeFileSync('pubspec.yaml', source.replace(/^(version: \S+\+)\d+$/m, (_, prefix) => prefix + number));
 
@@ -108,7 +109,7 @@ jobs:
           lipo "$app/Contents/MacOS/StackSpire" -verify_arch "$arch"
           lipo "$app/Contents/MacOS/FlClashCore" -verify_arch "$arch"
           codesign --verify --deep --strict "$app"
-          ditto -c -k --sequesterRsrc --keepParent "$app" "dist/StackSpire-macos-$BUILD_ARCH.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$app" "dist/StackSpire-${STACKSPIRE_VERSION}-macos-$BUILD_ARCH.zip"
           printf 'commit=%s\narchitecture=%s\nsigning=ad-hoc\nnotarized=false\n' "$GITHUB_SHA" "$BUILD_ARCH" > "dist/build-info-$BUILD_ARCH.txt"
           shasum -a 256 dist/*.dmg dist/*.zip > "dist/SHA256SUMS-$BUILD_ARCH.txt"
 
