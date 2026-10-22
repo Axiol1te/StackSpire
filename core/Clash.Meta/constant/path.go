@@ -137,7 +137,6 @@ func (p *path) MMDB() string {
 				strings.EqualFold(fi.Name(), "geoip.db") ||
 				strings.EqualFold(fi.Name(), "geoip.metadb") ||
 				strings.EqualFold(fi.Name(), "GEOIP.metadb") {
-				GeoipName = fi.Name()
 				return P.Join(p.homeDir, fi.Name())
 			}
 		}
