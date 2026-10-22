@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/core/interface.dart';
+import 'package:fl_clash/database/database.dart' as db;
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/manager/core_manager.dart';
@@ -153,6 +155,156 @@ void main() {
     } catch (_) {}
   });
 
+  group('live added rules', () {
+    late db.Database previousDatabase;
+    late db.Database testDatabase;
+    const profile = Profile(id: 1, autoUpdateDuration: Duration.zero);
+    const other = Profile(id: 2, autoUpdateDuration: Duration.zero);
+
+    setUp(() async {
+      previousDatabase = db.database;
+      testDatabase = db.Database(NativeDatabase.memory());
+      db.database = testDatabase;
+      await testDatabase.profilesDao.putAll([
+        profile.toCompanion(),
+        other.toCompanion(),
+      ]);
+    });
+
+    tearDown(() async {
+      db.database = previousDatabase;
+      await testDatabase.close();
+    });
+
+    Future<void> flush(WidgetTester tester) async {
+      await tester.runAsync(() => pumpEventQueue(times: 50));
+      await tester.pump();
+    }
+
+    testWidgets('committed edits refresh cached setup and apply immediately', (
+      tester,
+    ) async {
+      final action = _ApplyRecordingSetupAction();
+      final container = await _pumpCoreManager(
+        tester,
+        _coreInterface(),
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([profile, other])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+          initProvider.overrideWithBuild((_, _) => true),
+          setupActionProvider.overrideWith(() => action),
+        ],
+      );
+      await flush(tester);
+      expect(
+        (await container.read(
+          setupStateProvider(profile.id).future,
+        )).addedRules,
+        isEmpty,
+      );
+      final initialApplies = action.applies;
+      final rule = Rule.parse('DOMAIN,example.com,REJECT', id: 10);
+
+      await testDatabase.rulesDao.putRule(rule);
+      await flush(tester);
+      expect(action.applies, initialApplies + 1);
+      expect(
+        (await container.read(
+          setupStateProvider(profile.id).future,
+        )).addedRules,
+        [rule],
+      );
+
+      final edited = rule.copyWith(ruleTarget: 'DIRECT');
+      await testDatabase.rulesDao.putRule(edited);
+      await flush(tester);
+      expect(action.applies, initialApplies + 2);
+      expect(
+        (await container.read(
+          setupStateProvider(profile.id).future,
+        )).addedRules,
+        [edited],
+      );
+
+      await testDatabase.transaction(() async {
+        await testDatabase.rulesDao.putRule(edited.copyWith(order: 'a'));
+        await testDatabase.rulesDao.putRule(
+          Rule.parse('DOMAIN,other.com,REJECT', id: 11).copyWith(order: 'b'),
+        );
+      });
+      await flush(tester);
+      expect(action.applies, initialApplies + 3);
+      await testDatabase.rulesDao.order(ruleId: rule.id, order: 'c');
+      await flush(tester);
+      expect(action.applies, initialApplies + 4);
+      expect(
+        (await container.read(
+          setupStateProvider(profile.id).future,
+        )).addedRules.map((rule) => rule.id),
+        [11, 10],
+      );
+
+      await testDatabase.rulesDao.delRules([rule.id, 11]);
+      await flush(tester);
+      expect(action.applies, initialApplies + 5);
+      expect(
+        (await container.read(
+          setupStateProvider(profile.id).future,
+        )).addedRules,
+        isEmpty,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(milliseconds: 1));
+    });
+
+    testWidgets('ignores other profiles and respects disabled global rules', (
+      tester,
+    ) async {
+      final rule = Rule.parse('DOMAIN,example.com,REJECT', id: 10);
+      await testDatabase.rulesDao.putRule(rule);
+      final action = _ApplyRecordingSetupAction();
+      final container = await _pumpCoreManager(
+        tester,
+        _coreInterface(),
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([profile, other])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+          initProvider.overrideWithBuild((_, _) => true),
+          setupActionProvider.overrideWith(() => action),
+        ],
+      );
+      await flush(tester);
+      final initialApplies = action.applies;
+      await testDatabase.rulesDao.putRule(
+        Rule.parse('DOMAIN,other.com,REJECT', id: 11),
+        profileId: other.id,
+      );
+      await flush(tester);
+      expect(action.applies, initialApplies);
+
+      await testDatabase.rulesDao.putDisabled(profile.id, rule.id);
+      await flush(tester);
+      expect(action.applies, initialApplies + 1);
+      expect(
+        (await container.read(
+          setupStateProvider(profile.id).future,
+        )).addedRules,
+        isEmpty,
+      );
+      await testDatabase.rulesDao.delDisabled(profile.id, rule.id);
+      await flush(tester);
+      expect(action.applies, initialApplies + 2);
+      expect(
+        (await container.read(
+          setupStateProvider(profile.id).future,
+        )).addedRules,
+        [rule],
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(milliseconds: 1));
+    });
+  });
+
   testWidgets('duplicate crash events disconnect the core only once', (
     tester,
   ) async {
@@ -190,6 +342,8 @@ void main() {
     verifyNever(() => coreInterface.stop());
 
     await tester.pumpWidget(const SizedBox());
+
+    await tester.pump(const Duration(milliseconds: 1));
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
   });
 
@@ -208,6 +362,8 @@ void main() {
     expect(find.text('boom'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('a crash is ignored when the core is not connected', (
@@ -232,6 +388,8 @@ void main() {
     expect(find.text('boom'), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('the log stream follows the openLogs setting', (tester) async {
@@ -258,6 +416,8 @@ void main() {
     verify(() => coreInterface.stopLog()).called(1);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('the log stream waits for the core and is restored on '
@@ -291,6 +451,8 @@ void main() {
     verifyNever(() => coreInterface.stopLog());
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('a setting the Core patches live is not re-applied', (
@@ -312,6 +474,8 @@ void main() {
     expect(setupAction.applies, 0);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('a setting only a setup carries re-applies the profile', (
@@ -339,6 +503,8 @@ void main() {
     expect(setupAction.updates, 0);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('core logs are recorded for the logs view', (tester) async {
@@ -359,6 +525,8 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('core dns queries are recorded and counted', (tester) async {
@@ -388,6 +556,8 @@ void main() {
     expect(container.read(dnsQueryCountProvider), 2);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('geo events are forwarded to the geo resource action', (
@@ -414,6 +584,8 @@ void main() {
     expect(find.text('background failure'), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('route events reach the route tracker', (tester) async {
@@ -439,6 +611,8 @@ void main() {
     expect(route.synced, isTrue);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('non-geo Core errors retain global notifications', (
@@ -458,6 +632,8 @@ void main() {
     expect(find.text('core failure'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   group('profile switch failure', () {
@@ -498,6 +674,8 @@ void main() {
       expect(setupCalls, 1);
 
       await tester.pumpWidget(const SizedBox.shrink());
+
+      await tester.pump(const Duration(milliseconds: 1));
     });
 
     testWidgets('rapid A -> B -> C settles on C even when both are rejected', (
@@ -532,6 +710,8 @@ void main() {
       expect(setupCalls, 2);
 
       await tester.pumpWidget(const SizedBox.shrink());
+
+      await tester.pump(const Duration(milliseconds: 1));
     });
 
     testWidgets(
@@ -567,6 +747,8 @@ void main() {
         expect(container.read(currentProfileIdProvider), previous.id);
 
         await tester.pumpWidget(const SizedBox.shrink());
+
+        await tester.pump(const Duration(milliseconds: 1));
       },
     );
   });

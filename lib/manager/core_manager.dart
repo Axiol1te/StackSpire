@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/core/core.dart';
+import 'package:fl_clash/database/database.dart' show database;
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/action.dart';
@@ -25,6 +26,7 @@ class CoreManager extends ConsumerStatefulWidget {
 class _CoreContainerState extends ConsumerState<CoreManager>
     with CoreEventListener {
   CoreController get _core => ref.read(coreHandlerProvider);
+  StreamSubscription<List<Rule>>? _addedRulesSubscription;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,44 @@ class _CoreContainerState extends ConsumerState<CoreManager>
         unawaited(ref.read(setupActionProvider.notifier).fullSetup());
       });
     });
+    ref.listenManual(
+      currentProfileProvider.select(
+        (profile) => (profile?.id, profile?.type, profile?.extendType),
+      ),
+      (_, profile) {
+        unawaited(_addedRulesSubscription?.cancel());
+        _addedRulesSubscription = null;
+        final (id, type, extension) = profile;
+        if (id == null ||
+            type == ProfileType.custom ||
+            extension != ExtendType.standard) {
+          return;
+        }
+        _addedRulesSubscription = database.rulesDao
+            .queryAddedRules(id)
+            .watch()
+            .distinct(ruleListEquality.equals)
+            .listen(
+              (_) {
+                if (!mounted || ref.read(currentProfileIdProvider) != id) {
+                  return;
+                }
+                ref.invalidate(setupStateProvider(id));
+                if (!ref.read(initProvider)) return;
+                ref
+                    .read(setupActionProvider.notifier)
+                    .applyProfileDebounce(silence: true);
+              },
+              onError: (Object error, StackTrace stack) {
+                commonPrint.log(
+                  'Unable to watch added rules: ${compactError(error)}, $stack',
+                  logLevel: LogLevel.error,
+                );
+              },
+            );
+      },
+      fireImmediately: true,
+    );
     ref.listenManual(updateParamsProvider, (prev, next) {
       if (prev != next) {
         ref.read(setupActionProvider.notifier).updateConfigDebounce();
@@ -85,6 +125,7 @@ class _CoreContainerState extends ConsumerState<CoreManager>
 
   @override
   void dispose() {
+    unawaited(_addedRulesSubscription?.cancel());
     coreEventManager.removeListener(this);
     super.dispose();
   }
