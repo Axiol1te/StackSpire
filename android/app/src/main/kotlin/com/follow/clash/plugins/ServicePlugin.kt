@@ -40,7 +40,8 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             messenger.makeBackgroundTaskQueue(),
         )
         coreChannel.setMethodCallHandler(::onCoreMethodCall)
-        scope.launch(Dispatchers.Main.immediate) {
+        // Let start/stop record their command token before classifying the resulting state report.
+        scope.launch(Dispatchers.Main) {
             ServiceState.runState.collect { sendRunState() }
         }
     }

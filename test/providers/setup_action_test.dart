@@ -539,6 +539,36 @@ void main() {
       );
     });
 
+    test('a manual stop during suspension prevents resuming', () async {
+      container.dispose();
+      action = TestSetupAction();
+      container = ProviderContainer(
+        overrides: [
+          profilesProvider.overrideWith(TestProfiles.new),
+          setupActionProvider.overrideWith(() => action),
+          commonActionProvider.overrideWith(TestCommonAction.new),
+          excludeSSIDsProvider.overrideWithValue(const ['Office Wi-Fi']),
+        ],
+      );
+      globalState.container = container;
+      container.read(initProvider.notifier).value = true;
+      final setup = container.read(setupActionProvider.notifier);
+      await setup.setRunning(true);
+      container.read(currentSSIDProvider.notifier).value = 'Office Wi-Fi';
+      setup.syncSuspend();
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+
+      await setup.setRunning(false);
+      action.coreRunningCalls.clear();
+      container.read(currentSSIDProvider.notifier).value = 'Home';
+      setup.syncSuspend();
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+
+      expect(action.coreRunningCalls, isEmpty);
+      expect(container.read(isStartProvider), isFalse);
+      expect(container.read(runningVpnOptionsProvider), isNull);
+    });
+
     test('an SSID change leaves a stopped run alone', () async {
       markInitialized();
       container.read(setupActionProvider.notifier).syncSuspend();
